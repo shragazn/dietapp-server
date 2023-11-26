@@ -49,7 +49,7 @@ export const listSets = async (req: Request, res: Response) => {
     const response = sets.map((set) => setResponse(set, req));
     res.json(response);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -63,7 +63,7 @@ export const getSet = async (req: Request, res: Response) => {
 
     res.json(setResponse(set, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -79,7 +79,7 @@ export const createSet = async (req: Request, res: Response) => {
     const set = await db.createSet({ exerciseId, reps, weight });
     res.json(setResponse({ ...set, exercise: { workoutId } }, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -98,7 +98,7 @@ export const createSets = async (req: Request, res: Response) => {
     };
     res.json(response);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -113,7 +113,7 @@ export const updateSet = async (req: Request, res: Response) => {
     const set = await db.updateSet({ id, reps, weight });
     res.json(setResponse(set, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -125,7 +125,7 @@ export const deleteSet = async (req: Request, res: Response) => {
     const set = await db.deleteSet(id);
     res.json(setResponse(set, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -139,6 +139,6 @@ export const listByExercise = async (req: Request, res: Response) => {
     const response = sets.map((set) => setResponse(set, req));
     res.json(response);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };

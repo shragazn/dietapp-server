@@ -41,7 +41,7 @@ export const getExercise = async (req: Request, res: Response) => {
     if (!exercise) return res.status(404).json({ error: "Exercise not found" });
     res.json(exerciseResponse(exercise, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -59,7 +59,7 @@ export const listExercises = async (req: Request, res: Response) => {
     );
     res.json({ data: response });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -74,7 +74,7 @@ export const createExercise = async (req: Request, res: Response) => {
     const exercise = await db.createExercise({ workoutId, name });
     res.json(exerciseResponse(exercise, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -88,7 +88,7 @@ export const updateExercise = async (req: Request, res: Response) => {
     const exercise = await db.updateExercise({ id, name });
     res.json(exerciseResponse(exercise, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -100,6 +100,6 @@ export const deleteExercise = async (req: Request, res: Response) => {
     const exercise = await db.deleteExercise(id);
     res.json(exerciseResponse(exercise, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };

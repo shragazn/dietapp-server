@@ -66,7 +66,7 @@ export const getWorkout = async (req: Request, res: Response) => {
     if (!workout) return res.status(404).json({ error: "Workout not found" });
     res.json(workoutResponse(workout, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -78,7 +78,7 @@ export const createWorkout = async (req: Request, res: Response) => {
     const workout = await db.createWorkout({ userId, date });
     res.json(workoutResponse(workout, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -92,7 +92,7 @@ export const updateWorkout = async (req: Request, res: Response) => {
     const workout = await db.updateWorkout({ date, id });
     res.json(workoutResponse(workout, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -102,7 +102,7 @@ export const deleteWorkout = async (req: Request, res: Response) => {
     const workout = await db.deleteWorkout(id);
     res.json(workoutResponse(workout, req));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
 
@@ -113,6 +113,6 @@ export const getWorkouts = async (req: Request, res: Response) => {
     const response = workoutsResponse(workouts, req);
     res.json(response);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.sendStatus(500);
   }
 };
