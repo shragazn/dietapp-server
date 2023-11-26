@@ -32,6 +32,31 @@ const workoutResponse = (workout: Workout, req: Request) => {
   };
 };
 
+const workoutsResponse = (workouts: Workout[], req: Request) => {
+  const initial = {
+    data: [] as any,
+    message: "Workouts found",
+    actions: [
+      {
+        label: "Create",
+        url: `/workout`,
+        method: "POST",
+      },
+    ],
+    request: {
+      method: req.method,
+      url: req.originalUrl,
+      body: req.body,
+      params: req.params,
+    },
+  };
+  return workouts.reduce((acc, workout) => {
+    const currRes = workoutResponse(workout, req);
+    acc.data.push({ data: workout, actions: currRes.actions });
+    return acc;
+  }, initial);
+};
+
 export const getWorkout = async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!id) return res.status(400).json({ error: "id is required" });
@@ -85,9 +110,7 @@ export const getWorkouts = async (req: Request, res: Response) => {
   const userId = req.user!.id;
   try {
     const workouts = await db.listWorkouts(userId);
-    const response = workouts.map((workout: any) =>
-      workoutResponse(workout, req)
-    );
+    const response = workoutsResponse(workouts, req);
     res.json(response);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

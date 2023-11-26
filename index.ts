@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from "express";
 import auth from "./routes/auth";
 import jwt from "./middleware/jwt";
 import cookieParser from "cookie-parser";
+import workout from "./routes/workouts/workout";
 
 export const prisma = new PrismaClient();
 
@@ -21,6 +22,7 @@ app.use("/auth", auth);
 
 // private routes
 app.use(jwt());
+app.use("/workout", workout);
 
 app.get("/", (req, res) => {
   res.send("Hello world!");

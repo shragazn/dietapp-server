@@ -44,7 +44,6 @@ const register = async (req: Request, res: Response) => {
   return res
     .cookie(JWT_COOKIE_NAME, refreshToken, {
       httpOnly: true,
-      path: "/auth/refresh_token",
       maxAge: MAX_AGE,
     })
     .send({ ...newUser, password: undefined, accessToken });
@@ -87,7 +86,6 @@ const login = async (req: Request, res: Response) => {
   return res
     .cookie(JWT_COOKIE_NAME, refreshToken, {
       httpOnly: true,
-      path: "/auth/refresh_token",
       maxAge: MAX_AGE,
     })
     .send({ ...foundUser, password: undefined, accessToken });
@@ -96,10 +94,9 @@ const login = async (req: Request, res: Response) => {
 const logout = async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies;
   if (!refreshToken) {
-    return res.status(400).send("Missing refresh token");
+    return res.status(401).send("No refresh token provided");
   }
-
-  return res.clearCookie(JWT_COOKIE_NAME).send();
+  return res.clearCookie(JWT_COOKIE_NAME).send("Logged out");
 };
 
 const refreshTokens = async (req: Request, res: Response) => {
@@ -129,7 +126,6 @@ const refreshTokens = async (req: Request, res: Response) => {
   return res
     .cookie(JWT_COOKIE_NAME, newRefreshToken, {
       httpOnly: true,
-      path: "/auth/refresh_token",
       maxAge: MAX_AGE,
     })
     .send({ accessToken });

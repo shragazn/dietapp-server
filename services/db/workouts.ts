@@ -46,7 +46,7 @@ export const createWorkout = async ({
 }) => {
   const workout = await prisma.workout.create({
     data: {
-      date: new Date(),
+      date: new Date(date),
       user: {
         connect: {
           id: userId,
@@ -63,7 +63,7 @@ export const updateWorkout = async ({ id, date }: UpdateWorkout) => {
       id,
     },
     data: {
-      date,
+      date: new Date(date),
     },
   });
   return workout;

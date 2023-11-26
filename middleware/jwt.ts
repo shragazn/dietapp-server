@@ -12,7 +12,12 @@ const verifyJWT =
       return res.status(401).send("Missing token");
     }
 
-    const payload = jwt.verify(token, Bun.env.ACCESS_TOKEN_SECRET!);
+    let payload: string | jwt.JwtPayload | undefined;
+    jwt.verify(token, Bun.env.ACCESS_TOKEN_SECRET!, (err, decoded) => {
+      if (err) return;
+      payload = decoded;
+    });
+
     if (!payload || typeof payload === "string" || !payload.id) {
       return res.status(403).send("Invalid token");
     }
