@@ -1,5 +1,36 @@
 import * as db from "@db/index";
+import { Workout } from "@prisma/client";
 import { Request, Response } from "express";
+
+const workoutResponse = (workout: Workout, req: Request) => {
+  return {
+    data: workout,
+    message: "Workout found",
+    actions: [
+      {
+        label: "View",
+        url: `/workout/${workout.id}`,
+        method: "GET",
+      },
+      {
+        label: "Update",
+        url: `/workout/${workout.id}`,
+        method: "PUT",
+      },
+      {
+        label: "Delete",
+        url: `/workout/${workout.id}`,
+        method: "DELETE",
+      },
+    ],
+    request: {
+      method: req.method,
+      url: req.originalUrl,
+      body: req.body,
+      params: req.params,
+    },
+  };
+};
 
 export const getWorkout = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -7,7 +38,8 @@ export const getWorkout = async (req: Request, res: Response) => {
 
   try {
     const workout = await db.getWorkout(id);
-    res.json(workout);
+    if (!workout) return res.status(404).json({ error: "Workout not found" });
+    res.json(workoutResponse(workout, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -17,10 +49,9 @@ export const createWorkout = async (req: Request, res: Response) => {
   const { date } = req.body;
   const userId = req.user!.id;
   if (!date) return res.status(400).json({ error: "date is required" });
-
   try {
-    const workout = db.createWorkout({ userId, date });
-    res.json(workout);
+    const workout = await db.createWorkout({ userId, date });
+    res.json(workoutResponse(workout, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -33,8 +64,8 @@ export const updateWorkout = async (req: Request, res: Response) => {
   if (!date) return res.status(400).json({ error: "date is required" });
 
   try {
-    const workout = db.updateWorkout({ date, id });
-    res.json(workout);
+    const workout = await db.updateWorkout({ date, id });
+    res.json(workoutResponse(workout, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -43,8 +74,8 @@ export const updateWorkout = async (req: Request, res: Response) => {
 export const deleteWorkout = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const workout = db.deleteWorkout(id);
-    res.json(workout);
+    const workout = await db.deleteWorkout(id);
+    res.json(workoutResponse(workout, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -54,7 +85,10 @@ export const getWorkouts = async (req: Request, res: Response) => {
   const userId = req.user!.id;
   try {
     const workouts = await db.listWorkouts(userId);
-    res.json(workouts);
+    const response = workouts.map((workout: any) =>
+      workoutResponse(workout, req)
+    );
+    res.json(response);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

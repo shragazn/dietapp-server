@@ -17,6 +17,14 @@ export const listSets = async (exerciseId: string) => {
     where: {
       exerciseId,
     },
+    include: {
+      exercise: {
+        select: {
+          name: true,
+          workoutId: true,
+        },
+      },
+    },
   });
   return sets;
 };
@@ -25,6 +33,14 @@ export const getSet = async (id: string) => {
   const set = await prisma.set.findUnique({
     where: {
       id,
+    },
+    include: {
+      exercise: {
+        select: {
+          name: true,
+          workoutId: true,
+        },
+      },
     },
   });
   return set;
@@ -47,7 +63,14 @@ export const createSets = async ({
 };
 
 export const createSet = async ({ exerciseId, reps, weight }: CreateSet) => {
-  return createSets({ exerciseId, sets: [{ reps, weight }] });
+  const createdSet = await prisma.set.create({
+    data: {
+      reps,
+      weight,
+      exerciseId,
+    },
+  });
+  return createdSet;
 };
 
 export const updateSet = async ({
@@ -63,6 +86,14 @@ export const updateSet = async ({
       reps,
       weight,
     },
+    include: {
+      exercise: {
+        select: {
+          name: true,
+          workoutId: true,
+        },
+      },
+    },
   });
   return set;
 };
@@ -71,6 +102,14 @@ export const deleteSet = async (id: string) => {
   const set = await prisma.set.delete({
     where: {
       id,
+    },
+    include: {
+      exercise: {
+        select: {
+          name: true,
+          workoutId: true,
+        },
+      },
     },
   });
   return set;
@@ -86,6 +125,14 @@ export const listSetsByExercise = async ({
         name: exerciseName,
         workout: {
           userId,
+        },
+      },
+    },
+    include: {
+      exercise: {
+        select: {
+          name: true,
+          workoutId: true,
         },
       },
     },

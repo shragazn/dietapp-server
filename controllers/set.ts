@@ -1,5 +1,41 @@
 import * as db from "@db/index";
+import { Set as WorkoutSet } from "@prisma/client";
 import { Request, Response } from "express";
+
+const setResponse = <
+  T extends WorkoutSet & { exercise: { workoutId: string } }
+>(
+  set: T,
+  req: Request
+) => {
+  return {
+    data: set,
+    message: "Set found",
+    actions: [
+      {
+        label: "View",
+        url: `/workout/${set.exercise.workoutId}/exercise/${set.exerciseId}/set/${set.id}`,
+        method: "GET",
+      },
+      {
+        label: "Update",
+        url: `/workout/${set.exercise.workoutId}/exercise/${set.exerciseId}/set/${set.id}`,
+        method: "PUT",
+      },
+      {
+        label: "Delete",
+        url: `/workout/${set.exercise.workoutId}/exercise/${set.exerciseId}/set/${set.id}`,
+        method: "DELETE",
+      },
+    ],
+    request: {
+      method: req.method,
+      url: req.originalUrl,
+      body: req.body,
+      params: req.params,
+    },
+  };
+};
 
 export const listSets = async (req: Request, res: Response) => {
   const { exerciseId } = req.params;
@@ -8,7 +44,10 @@ export const listSets = async (req: Request, res: Response) => {
 
   try {
     const sets = await db.listSets(exerciseId);
-    res.json(sets);
+    if (!sets.length) return res.status(404).json({ error: "Sets not found" });
+
+    const response = sets.map((set) => setResponse(set, req));
+    res.json(response);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -20,14 +59,16 @@ export const getSet = async (req: Request, res: Response) => {
 
   try {
     const set = await db.getSet(id);
-    res.json(set);
+    if (!set) return res.status(404).json({ error: "Set not found" });
+
+    res.json(setResponse(set, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 };
 
 export const createSet = async (req: Request, res: Response) => {
-  const { exerciseId } = req.params;
+  const { exerciseId, workoutId } = req.params;
   if (!exerciseId)
     return res.status(400).json({ error: "exerciseId is required" });
   const { reps, weight } = req.body;
@@ -36,14 +77,14 @@ export const createSet = async (req: Request, res: Response) => {
 
   try {
     const set = await db.createSet({ exerciseId, reps, weight });
-    res.json(set);
+    res.json(setResponse({ ...set, exercise: { workoutId } }, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 };
 
 export const createSets = async (req: Request, res: Response) => {
-  const { exerciseId } = req.params;
+  const { exerciseId, workoutId } = req.params;
   if (!exerciseId)
     return res.status(400).json({ error: "exerciseId is required" });
   const { sets } = req.body;
@@ -51,7 +92,11 @@ export const createSets = async (req: Request, res: Response) => {
 
   try {
     const createdSets = await db.createSets({ exerciseId, sets });
-    res.json(createdSets);
+    const response = {
+      message: "Sets created",
+      data: createdSets,
+    };
+    res.json(response);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -66,7 +111,7 @@ export const updateSet = async (req: Request, res: Response) => {
 
   try {
     const set = await db.updateSet({ id, reps, weight });
-    res.json(set);
+    res.json(setResponse(set, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -78,7 +123,7 @@ export const deleteSet = async (req: Request, res: Response) => {
 
   try {
     const set = await db.deleteSet(id);
-    res.json(set);
+    res.json(setResponse(set, req));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -91,7 +136,8 @@ export const listByExercise = async (req: Request, res: Response) => {
 
   try {
     const sets = await db.listSetsByExercise({ exerciseName, userId });
-    res.json(sets);
+    const response = sets.map((set) => setResponse(set, req));
+    res.json(response);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
