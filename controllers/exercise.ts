@@ -9,17 +9,17 @@ const exerciseResponse = (exercise: Exercise, req: Request) => {
     actions: [
       {
         label: "View",
-        url: `workout/${exercise.workoutId}/exercise/${exercise.id}`,
+        url: `exercise/${exercise.id}`,
         method: "GET",
       },
       {
         label: "Update",
-        url: `workout/${exercise.workoutId}/exercise/${exercise.id}`,
+        url: `exercise/${exercise.id}`,
         method: "PUT",
       },
       {
         label: "Delete",
-        url: `workout/${exercise.workoutId}/exercise/${exercise.id}`,
+        url: `exercise/${exercise.id}`,
         method: "DELETE",
       },
     ],
@@ -28,6 +28,7 @@ const exerciseResponse = (exercise: Exercise, req: Request) => {
       url: req.originalUrl,
       body: req.body,
       params: req.params,
+      query: req.query,
     },
   };
 };
@@ -40,6 +41,23 @@ export const getExercise = async (req: Request, res: Response) => {
     const exercise = await db.getExercise(id);
     if (!exercise) return res.status(404).json({ error: "Exercise not found" });
     res.json(exerciseResponse(exercise, req));
+  } catch (error: any) {
+    res.sendStatus(500);
+  }
+};
+
+export const listExercisesByName = async (req: Request, res: Response) => {
+  const { name } = req.query;
+  if (!name) return res.status(400).json({ error: "name is required" });
+
+  try {
+    const exercises = await db.listExercisesByName(name as string);
+    if (!exercises.length)
+      return res.status(404).json({ error: "Exercises not found" });
+    const response = exercises.map((exercise) =>
+      exerciseResponse(exercise, req)
+    );
+    res.json({ data: response });
   } catch (error: any) {
     res.sendStatus(500);
   }

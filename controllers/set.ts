@@ -14,17 +14,17 @@ const setResponse = <
     actions: [
       {
         label: "View",
-        url: `/workout/${set.exercise.workoutId}/exercise/${set.exerciseId}/set/${set.id}`,
+        url: `/set/${set.id}`,
         method: "GET",
       },
       {
         label: "Update",
-        url: `/workout/${set.exercise.workoutId}/exercise/${set.exerciseId}/set/${set.id}`,
+        url: `/set/${set.id}`,
         method: "PUT",
       },
       {
         label: "Delete",
-        url: `/workout/${set.exercise.workoutId}/exercise/${set.exerciseId}/set/${set.id}`,
+        url: `/set/${set.id}`,
         method: "DELETE",
       },
     ],
@@ -84,7 +84,7 @@ export const createSet = async (req: Request, res: Response) => {
 };
 
 export const createSets = async (req: Request, res: Response) => {
-  const { exerciseId, workoutId } = req.params;
+  const { exerciseId } = req.params;
   if (!exerciseId)
     return res.status(400).json({ error: "exerciseId is required" });
   const { sets } = req.body;
@@ -124,20 +124,6 @@ export const deleteSet = async (req: Request, res: Response) => {
   try {
     const set = await db.deleteSet(id);
     res.json(setResponse(set, req));
-  } catch (error: any) {
-    res.sendStatus(500);
-  }
-};
-
-export const listByExercise = async (req: Request, res: Response) => {
-  const { exerciseName } = req.body;
-  const userId = req.user!.id;
-  if (!exerciseName) return res.status(400).json({ error: "name is required" });
-
-  try {
-    const sets = await db.listSetsByExercise({ exerciseName, userId });
-    const response = sets.map((set) => setResponse(set, req));
-    res.json(response);
   } catch (error: any) {
     res.sendStatus(500);
   }

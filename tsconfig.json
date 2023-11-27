@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@db/*": ["./services/db/*"]
+      "@db/*": ["./services/db/*"],
+      "@routes/*": ["./routes/*"]
     }
   }
 }

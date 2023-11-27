@@ -34,6 +34,20 @@ export const listExercises = async (workoutId: string) => {
   return exercises;
 };
 
+export const listExercisesByName = async (name: string) => {
+  const exercises = await prisma.exercise.findMany({
+    where: {
+      name: {
+        contains: name,
+      },
+    },
+    include: {
+      sets: true,
+    },
+  });
+  return exercises;
+};
+
 export const createExercise = async ({ workoutId, name }: CreateExercise) => {
   const exercise = await prisma.exercise.create({
     data: {

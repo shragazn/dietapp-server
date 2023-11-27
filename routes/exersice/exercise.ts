@@ -1,14 +1,11 @@
 import { Router } from "express";
-import set from "./set";
 import * as exerciseController from "@/controllers/exercise";
-import * as setController from "@/controllers/set";
+import set from "./set";
 
-const router = Router({ mergeParams: true });
-router.get("/", exerciseController.listExercises);
-router.post("/", exerciseController.createExercise);
+const router = Router();
+router.get("/", exerciseController.listExercisesByName);
 router.get("/:id", exerciseController.getExercise);
 router.put("/:id", exerciseController.updateExercise);
 router.delete("/:id", exerciseController.deleteExercise);
 router.use("/:exerciseId/set", set);
-router.get("/name", setController.listByExercise);
 export default router;

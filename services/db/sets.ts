@@ -114,28 +114,3 @@ export const deleteSet = async (id: string) => {
   });
   return set;
 };
-
-export const listSetsByExercise = async ({
-  exerciseName,
-  userId,
-}: ListSetsByExercise) => {
-  const sets = await prisma.set.findMany({
-    where: {
-      exercise: {
-        name: exerciseName,
-        workout: {
-          userId,
-        },
-      },
-    },
-    include: {
-      exercise: {
-        select: {
-          name: true,
-          workoutId: true,
-        },
-      },
-    },
-  });
-  return sets;
-};
